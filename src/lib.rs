@@ -103,11 +103,13 @@ pub type BuildNoHashHasher<T> = BuildHasherDefault<NoHashHasher<T>>;
 /// assert_eq!(Some(&'a'), m.get(&0));
 /// assert_eq!(Some(&'b'), m.get(&1));
 /// ```
+
+type UNDERLYING_HASH_TYPE = u64;
 #[cfg(debug_assertions)]
-pub struct NoHashHasher<T>(u64, bool, PhantomData<T>);
+pub struct NoHashHasher<T>(UNDERLYING_HASH_TYPE, bool, PhantomData<T>);
 
 #[cfg(not(debug_assertions))]
-pub struct NoHashHasher<T>(u64, PhantomData<T>);
+pub struct NoHashHasher<T>(UNDERLYING_HASH_TYPE, PhantomData<T>);
 
 impl<T> fmt::Debug for NoHashHasher<T> {
     #[cfg(debug_assertions)]
@@ -201,19 +203,19 @@ impl<T: IsEnabled> Hasher for NoHashHasher<T> {
         panic!("Invalid use of NoHashHasher")
     }
 
-    fn write_u8(&mut self, n: u8)       { self.0 = u64::from(n) }
-    fn write_u16(&mut self, n: u16)     { self.0 = u64::from(n) }
-    fn write_u32(&mut self, n: u32)     { self.0 = u64::from(n) }
+    fn write_u8(&mut self, n: u8)       { self.0 = UNDERLYING_HASH_TYPE::from(n) }
+    fn write_u16(&mut self, n: u16)     { self.0 = UNDERLYING_HASH_TYPE::from(n) }
+    fn write_u32(&mut self, n: u32)     { self.0 = UNDERLYING_HASH_TYPE::from(n) }
     fn write_u64(&mut self, n: u64)     { self.0 = n }
-    fn write_usize(&mut self, n: usize) { self.0 = n as u64 }
+    fn write_usize(&mut self, n: usize) { self.0 = n as UNDERLYING_HASH_TYPE }
 
-    fn write_i8(&mut self, n: i8)       { self.0 = n as u64 }
-    fn write_i16(&mut self, n: i16)     { self.0 = n as u64 }
-    fn write_i32(&mut self, n: i32)     { self.0 = n as u64 }
-    fn write_i64(&mut self, n: i64)     { self.0 = n as u64 }
-    fn write_isize(&mut self, n: isize) { self.0 = n as u64 }
+    fn write_i8(&mut self, n: i8)       { self.0 = n as UNDERLYING_HASH_TYPE }
+    fn write_i16(&mut self, n: i16)     { self.0 = n as UNDERLYING_HASH_TYPE }
+    fn write_i32(&mut self, n: i32)     { self.0 = n as UNDERLYING_HASH_TYPE }
+    fn write_i64(&mut self, n: i64)     { self.0 = n as UNDERLYING_HASH_TYPE }
+    fn write_isize(&mut self, n: isize) { self.0 = n as UNDERLYING_HASH_TYPE }
 
-    fn finish(&self) -> u64 { self.0 }
+    fn finish(&self) -> UNDERLYING_HASH_TYPE { self.0 }
 }
 
 #[cfg(debug_assertions)]
